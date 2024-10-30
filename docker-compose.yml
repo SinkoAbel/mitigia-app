@@ -1,0 +1,30 @@
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      - server
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/mitigia
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=rootpasswd
+    depends_on:
+      - db
+
+  db:
+    image: mysql:9
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpasswd
+      - MYSQL_DATABASE=mitigia
+    ports:
+      - "3307:3306"
