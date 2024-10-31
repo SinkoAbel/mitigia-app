@@ -1,9 +1,11 @@
 package com.mitigia.server.controllers;
 
 import com.mitigia.server.dtos.MileageRequestDTO;
-import com.mitigia.server.models.Vehicle;
-import com.mitigia.server.repositories.VehicleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mitigia.server.models.Project;
+import com.mitigia.server.models.VehicleMileage;
+import com.mitigia.server.services.MileageService;
+import com.mitigia.server.services.ProjectService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,30 +13,59 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/api/vehicle")
 public class VehicleController {
 
-    @Autowired
-    private final VehicleRepository repository;
+    private final MileageService mileageService;
+    private final ProjectService projectService;
 
-    public VehicleController(VehicleRepository repository) {
-        this.repository = repository;
+    public VehicleController(MileageService mileageService, ProjectService projectService) {
+        this.mileageService = mileageService;
+        this.projectService = projectService;
     }
 
-    @PostMapping("/store")
-    public ResponseEntity<Vehicle> storeMileageData(@RequestBody MileageRequestDTO request) {
-        /**
-         * TODO:
-         *  1. Check if a licence plate exists in a project!
-         *      1.5. If NO return 'NOT_FOUND'
-         *  2. If it exists check the last record in VehicleMileages by `date`.
-         *      2.5. The provided mileage data CAN NOT be smaller than the last `actual_mileage`. Only Greater values accepted.
-         *  3. Check other fields.
-         *  4. If the save was successful return the saved item.
-         */
+    @PostMapping("/store/mileage")
+    public ResponseEntity<VehicleMileage> storeMileageData(@Valid @RequestBody MileageRequestDTO request) {
+        Project project = projectService
+            .getProjectByLicencePlate(request.getLicencePlate())
+            .orElse(null);
 
-        // TODO: change return value
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        if (project == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        VehicleMileage lastMileageData = mileageService
+            .getLastVehicleMileage(project.getVehicle().getId())
+            .orElse(null);
+
+        if (lastMileageData == null) {
+            VehicleMileage savedMileage =
+                mileageService.storeVehicleMileage(
+                    request.getMileage(),
+                    request.getDate(),
+                    project.getVehicle().getId()
+                );
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedMileage);
+        }
+
+        Integer lastMileage = lastMileageData.getActualMileage();
+        LocalDate lastDate = lastMileageData.getDate();
+
+        if (lastMileage >= request.getMileage()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if (request.getDate().isBefore(lastDate)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        VehicleMileage savedMileage =
+            mileageService.storeVehicleMileage(request.getMileage(), request.getDate(), project.getVehicle().getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedMileage);
     }
 }

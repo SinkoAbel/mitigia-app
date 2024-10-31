@@ -1,5 +1,7 @@
 package com.mitigia.server.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,8 +42,10 @@ public class Vehicle {
     private Short nedcEnergyConsumption;
 
     @OneToMany(mappedBy = "vehicle")
+    @JsonManagedReference
     private List<VehicleMileage> vehicleMileages;
 
     @OneToMany(mappedBy = "vehicle")
+    @JsonBackReference
     private List<Project> projects;
 }

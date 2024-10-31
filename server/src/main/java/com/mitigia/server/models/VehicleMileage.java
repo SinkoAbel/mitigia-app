@@ -1,5 +1,6 @@
 package com.mitigia.server.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,9 +23,10 @@ public class VehicleMileage {
 
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
+    @JsonBackReference
     private Vehicle vehicle;
 
-    private Short actualMileage;
+    private Integer actualMileage;
 
     private LocalDate date;
 }
