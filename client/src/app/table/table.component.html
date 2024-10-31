@@ -1,0 +1,31 @@
+<div class="mt-5 flex justify-center">
+    <table class="min-w-full bg-white border border-gray-200 shadow-md overflow-hidden">
+        <thead class="border-b border-t border-black">
+            <tr class="bg-blue-100 text-center">
+                <th class="border-r border-black">Id</th>
+                <th class="border-r border-black">Licence plate</th>
+                <th class="border-r border-black">Manufacturer</th>
+                <th class="border-r border-black">Model</th>
+                <th class="border-r border-black">Manufacturing date</th>
+                <th class="border-r border-black">Type</th>
+                <th class="border-r border-black">Current mileage</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr
+                *ngFor="let project of projects"
+                class="odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition duration-300"
+            >
+                <td>{{project.id}}</td>
+                <td>{{project.licencePlate}}</td>
+                <td>{{project.vehicle.manufacturer}}</td>
+                <td>{{project.vehicle.model}}</td>
+                <td>{{project.vehicle.year}}</td>
+                <td>{{project.vehicle.type}}</td>
+                <td>{{project.lastMileage?.actualMileage ?? 0}} km</td>
+                <td>{{project.lastMileage?.date ?? "N/A"}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

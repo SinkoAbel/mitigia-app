@@ -1,0 +1,53 @@
+<div class="mt-5 flex justify-center">
+    <p *ngIf="errorMsg" class="bg-red-500">
+        {{errorMsg}}
+    </p>
+
+    <form novalidate [formGroup]="mileageForm" (ngSubmit)="newMileageData()">
+        <p class="text-center underline text-xl font-bold">Add new mileage</p>
+        <div>
+            <div class="mt-5">
+                <div class="bg-danger"
+                    *ngIf="!mileageForm.controls['licenceField'].valid &&
+                    (mileageForm.controls['licenceField'].dirty || mileageForm.controls['licenceField'].touched)"
+                >
+                    <p class="text-red-500">Please fill the field with a valid licence plate!</p>
+                    <span class="text-red-500" *ngIf="mileageForm.controls['licenceField'].errors?.['required']">Field is required!</span>
+                    <span class="text-red-500" *ngIf="mileageForm.controls['licenceField'].errors?.['minlength']">Length should be at least 6 characters!</span>
+                    <span class="text-red-500" *ngIf="mileageForm.controls['licenceField'].errors?.['maxLength']">Length should be maximum 6 characters!</span>
+                </div>
+                <input type="text" formControlName="licenceField" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Licence plate:" required minlength="6" maxlength="6"/>
+            </div>
+            <div class="mt-5">
+                <div class="bg-danger"
+                    *ngIf="!mileageForm.controls['dateField'].valid &&
+                    (mileageForm.controls['dateField'].dirty || mileageForm.controls['dateField'].touched)"
+                >
+                    <p class="text-red-500">Please provide a valid date!</p>
+                    <span class="text-red-500" *ngIf="mileageForm.controls['dateField'].errors?.['required']">Field is required!</span>
+                </div>
+                <input formControlName="dateField" type="date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Date:" required/>
+            </div>
+            <div class="mt-5 w-max">
+                <div class="bg-danger"
+                    *ngIf="!mileageForm.controls['mileageField'].valid &&
+                    (mileageForm.controls['mileageField'].dirty || mileageForm.controls['mileageField'].touched)"
+                >
+                    <p class="text-red-500">Please provide valid mileage!</p>
+                    <span class="text-red-500" *ngIf="mileageForm.controls['mileageField'].errors?.['required']">Field is required!</span>                    
+                </div>
+                <input formControlName="mileageField" type="number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="New mileage:" required/>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" [disabled]="!mileageForm.valid">
+                    Save
+                </button>
+            </div>
+        </div>
+
+        <p *ngIf="successMsg" class="text-green-500 text-center mt-2">
+            {{successMsg}}
+        </p>
+    </form>
+</div>
